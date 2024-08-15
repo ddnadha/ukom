@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class TransactionController extends Controller
@@ -21,7 +23,7 @@ class TransactionController extends Controller
         if (auth()->user()->role == 'admin') { // if user is admin, query all transaction
             $transactions = Transaction::query();
         } else { // otherwise, query transaction that owned by logged user
-            $transactions = $request->user()->transaction();
+            $transactions = $request->user()->merchant->transaction();
         }
 
         // display view of transaction
@@ -38,9 +40,22 @@ class TransactionController extends Controller
         // query all cart items
         $savedCart = collect($request->session()->get('cart', []));
         $carts = Item::query()->whereIn('id', $savedCart->pluck('item_id'))->get();
+
+        $startTime = microtime(true);
+        $startMemory = memory_get_usage();
+
         $carts->each(function ($cart) use ($savedCart) {
             $cart->{'qty'} = $savedCart->firstWhere('item_id', $cart->id)->qty;
         });
+
+        $endTime = microtime(true);
+        $endMemory = memory_get_usage();
+
+        $executionTime = $endTime - $startTime;
+        $memoryUsed = $endMemory - $startMemory;
+
+        Log::info("Waktu eksekusi: " . $executionTime . " detik");
+        Log::info("Memori yang digunakan: " . $memoryUsed . " bytes");
 
         return view('transaction.cart', compact('carts'));
     }
@@ -50,8 +65,10 @@ class TransactionController extends Controller
      */
     public function create(Request $request)
     {
+        if (auth()->user()->role == 'admin') return $this->index($request);
         // query items
-        $items = Item::query();
+        $items = Item::query()
+            ->where('merchant_id', $request->user()->merchant->id);
 
         // if user selected a category, filter by category
         if ($request->has('q')) {
@@ -108,7 +125,7 @@ class TransactionController extends Controller
 
             // clear cart
             $request->session()->forget('cart');
-            $request->session()->flush();
+            // $request->session()->flush();
 
             // commit save to database
             DB::commit();
@@ -201,5 +218,11 @@ class TransactionController extends Controller
 
         // redirect back
         return redirect()->back()->with('success', 'Berhasil menambahkan barang ke keranjang');
+    }
+
+    public function print(Transaction $transaction)
+    {
+        $pdf = Pdf::loadView('transaction.pdf', compact('transaction'));
+        return $pdf->download('transaction-' . $transaction->id . '.pdf');
     }
 }
