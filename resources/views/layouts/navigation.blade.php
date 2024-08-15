@@ -11,23 +11,44 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
+
                 @if (auth()->user()->role == 'admin')
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.index')">
                             {{ __('User') }}
                         </x-nav-link>
                     </div>
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('merchant.index')" :active="request()->routeIs('merchant.index')">
+                            {{ __('Merchant') }}
+                        </x-nav-link>
+                    </div>
+                @else
+                    @if (auth()->user()->merchant && auth()->user()->merchant->status != 'pending')
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('transaction.index')" :active="request()->routeIs('transaction.index')">
+                                {{ __('Transaction') }}
+                            </x-nav-link>
+                        </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('item.index')" :active="request()->routeIs('item.index')">
+                                {{ __('Item') }}
+                            </x-nav-link>
+                        </div>
+                    @elseif(!auth()->user()->merchant)
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('merchant.create')" :active="request()->routeIs('merchant.create')">
+                                {{ __('Daftar Merchant') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
                 @endif
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('transaction.index')" :active="request()->routeIs('transaction.index')">
-                        {{ __('Transaction') }}
-                    </x-nav-link>
-                </div>
+
             </div>
 
             <!-- Settings Dropdown -->

@@ -25,19 +25,18 @@
                         </thead>
 
                         <tbody class="divide-y divide-gray-200">
-                            @foreach($users as $user)
+                            @foreach ($users as $user)
                                 <tr>
                                     <td class="whitespace-nowrap p-4 text-gray-900">{{ $user->name }}</td>
-                                    <td class="whitespace-nowrap p-4 text-gray-700">{{ $user->birthdate->format('d M Y') }}</td>
+                                    <td class="whitespace-nowrap p-4 text-gray-700">
+                                        {{ $user->birthdate->format('d M Y') }}</td>
                                     <td class="whitespace-nowrap p-4 text-gray-700">{{ $user->gender }}</td>
                                     <td class="whitespace-nowrap p-4 text-gray-700">{{ $user->phone }}</td>
                                     <td class="whitespace-nowrap p-4">
-                                    <a
-                                        href="#"
-                                        class="inline-block rounded bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700"
-                                    >
-                                        View
-                                    </a>
+                                        <a href="#"
+                                            class="inline-block rounded bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700">
+                                            View
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

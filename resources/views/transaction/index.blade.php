@@ -48,9 +48,9 @@
                                     </td>
                                     <td class="whitespace-nowrap p-4 text-gray-700">Rp. @rupiah($transaction->total)</td>
                                     <td class="whitespace-nowrap p-4">
-                                        <a href="#"
+                                        <a href="{{ route('transaction.print', $transaction) }}"
                                             class="inline-block rounded bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700">
-                                            View
+                                            Print
                                         </a>
                                     </td>
                                 </tr>
